@@ -16,10 +16,10 @@ minimal_mistakes_skin    : "haxor" # "air", "aqua", "contrast", "dark", "dirt", 
 
 # Site Settings
 locale                   : "en-US"
-title                    : "HackPage"
+title                    : "H4ckPage - janumejia"
 title_separator          : "-"
-name                     : "Janumejia"
-description              : "Posts about security, CTFs and networking"
+name                     : "janumejia"
+description              : "Ciberseguridad y Hacking Ético"
 url                      : #"https://janumejia.github.io/HackPage" # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : "janumejia/HackPage" # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
@@ -103,7 +103,7 @@ analytics:
 author:
   name             : "Julián A. Núñez"
   avatar           : "/assets/images/avatarlobito.jpg"
-  bio              : "Información que voy aprendiendo sobre Hacking"
+  bio              : "Información que voy aprendiendo sobre Ciberseguridad y Hacking Ético"
   location         : "Colombia"
   email            : #"info@snowscan.io"
   uri              :
