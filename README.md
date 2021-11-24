@@ -12,3 +12,4 @@ bundle
 bundle exec jekyll serve
 ```
 
+Ver en http://localhost:4000/
