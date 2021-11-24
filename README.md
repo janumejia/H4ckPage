@@ -1,4 +1,4 @@
-## HackPage - Estas en mi página https://janumejia.github.io/HackPage/
+## Estas en mi página https://janumejia.github.io/HackPage/
 
 Aquí escribo información que voy aprendiendo acerca de hacking.
 
