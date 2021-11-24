@@ -1,6 +1,6 @@
 # Mi página: https://janumejia.github.io/HackPage/
 
-_Aquí escribo información que voy aprendiendo acerca de hacking._
+_Aquí escribo información que voy aprendiendo sobre Ciberseguridad y Hacking Ético._
 
 ## Prueba local 🚀
 
