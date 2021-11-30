@@ -1,5 +1,5 @@
 main:
-  - title: "Inicio"
+  - title: "Home"
     url: /
   - title: "Publicaciones"
     url: /year-archive/

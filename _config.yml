@@ -12,11 +12,11 @@
 
 # theme                  : "minimal-mistakes-jekyll"
 remote_theme             : "mmistakes/minimal-mistakes@4.15.1"
-minimal_mistakes_skin    : "haxor" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
+minimal_mistakes_skin    : "dark" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise" (Estaba "haxor")
 
 # Site Settings
 locale                   : "en-US"
-title                    : "H4ckPage | janumejia"
+title                    : "HackPage | janumejia"
 title_separator          : "-"
 name                     : "janumejia"
 description              : "Ciberseguridad y Hacking Ético"
