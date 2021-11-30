@@ -1,4 +1,4 @@
-# Mi página: https://janumejia.github.io/H4ckPage/
+# Mi página: https://janumejia.github.io
 
 _Aquí escribo información que voy aprendiendo sobre Ciberseguridad y Hacking Ético._
 
