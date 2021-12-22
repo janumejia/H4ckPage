@@ -21,7 +21,7 @@ tags:
   <img src="../assets/images/htb-writeup-magic/magic_logo.png">
 </p>
 
-** Antes de iniciar:
+## Antes de iniciar:
 Como es mi primera maquina virtual (box) y soy nuevo con la plataforma de hackthebox, para poder jugar con las maquinas virtuales necesito una conexión con OpenVPN (esta aplicación viene preinstalada en Parrot OS). Esta aplicación permitirá ubicar nuestra host en la misma subred IP que las máquinas vulnerables (boxes), lo que le permitirá contactarlos y atacarlos.
 
 Me ayudé con este video: https://www.youtube.com/watch?v=SmbpScohIFs . Este video muestra como descargar el archivo de configuración automatica de nuestro cliente de OpenVPN e inicializar la conexión con el servidor. El archivo descargado tendra la extensión .ovpn (tickets).
