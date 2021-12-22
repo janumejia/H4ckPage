@@ -5,16 +5,21 @@ excerpt: "Inyección de SQL es una vulnerabilidad de una aplicación web que per
 date: 2021-12-15
 classes: wide
 header:
-  teaser: /assets/images/que-es-inyeccion-sql\Ilustracion_Inyeccion_SQL.png
+  teaser: /assets/images/htb-writeup-magic/magic_logo.png
   teaser_home_page: true
   icon: /assets/images/hackthebox.webp
 categories:
-  - SQL Injection
-  - HTB
-  - 
+  - Hack The Box
 tags:
   - SQL Injection
+  - MySQL
+  - PHP
+  - Unrestricted File Upload
 ---
+
+<p align="center">
+  <img src="../assets/images/htb-writeup-magic/magic_logo.png">
+</p>
 
 ** Antes de iniciar:
 Como es mi primera maquina virtual (box) y soy nuevo con la plataforma de hackthebox, para poder jugar con las maquinas virtuales necesito una conexión con OpenVPN (esta aplicación viene preinstalada en Parrot OS). Esta aplicación permitirá ubicar nuestra host en la misma subred IP que las máquinas vulnerables (boxes), lo que le permitirá contactarlos y atacarlos.
@@ -382,7 +387,7 @@ Podemos consultar la imagen con esta url: [http://10.10.10.185/images/uploads/im
 Por las rutas de las imagenes que ya estan podemos decir que las imagenes son almacenadas en 2 rutas:  
 - [http://10.10.10.185/images/uploads](http://10.10.10.185/images/uploads)
 - [http://10.10.10.185/images/fulls](http://10.10.10.185/images/fulls)
-Intentaremos subir a nuestra página un archivo de tipo php (esta vulnerabilidad está reportada en [OWASP](https:images/uploads/imagen-de-prueba.png//owasp.org/www-community/vulnerabilities/Unrestricted_File_Upload) ), el cual nos permita ejecutar comandos a nivel de sistema (dentro del servidor) a través de la URL. El archivo “prueba.php” es el siguiente:
+Intentaremos subir a nuestra página un archivo de tipo php (esta vulnerabilidad está reportada en [OWASP](https://owasp.org/www-community/vulnerabilities/Unrestricted_File_Upload) ), el cual nos permita ejecutar comandos a nivel de sistema (dentro del servidor) a través de la URL. El archivo “prueba.php” es el siguiente:
 
 ´´´
 <?php
