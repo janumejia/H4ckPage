@@ -67,7 +67,7 @@ Respuesta:
 
 ```
 
-** Desarrollo de la practica:
+## Desarrollo de la practica:
 
 Basado en video de S4vitar on live: https://www.youtube.com/watch?v=ZJ72UuUlz10  
 
