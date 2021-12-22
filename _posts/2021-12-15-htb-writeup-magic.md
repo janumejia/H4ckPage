@@ -120,12 +120,12 @@ nmap -p- --open -T5 -v -n 10.10.10.185
 ```
 
 Con el anterior comando estamos diciendo:
-	* -p- → Escaneamos todo el rango de puertos (65.535 puertos).
-	* --open → Filtramos dejando solo los puertos que estan abiertos.
-	* -T5 → (Varia entre T0 hasta T5) Indica la rapidez con que queremos que se realice nuestro escaneo. En este caso es lo más rapido.
+	- -p- → Escaneamos todo el rango de puertos (65.535 puertos).
+	- --open → Filtramos dejando solo los puertos que estan abiertos.
+	- -T5 → (Varia entre T0 hasta T5) Indica la rapidez con que queremos que se realice nuestro escaneo. En este caso es lo más rapido.
 
-	* -v → De verbose. A medida que encuentra puertos abiertos me los reporte por consola.
-	* -n → Para no aplicar resolución DNS y nuestro escaneo será más rápido.
+	- -v → De verbose. A medida que encuentra puertos abiertos me los reporte por consola.
+	- -n → Para no aplicar resolución DNS y nuestro escaneo será más rápido.
 
 Resultado:
 
@@ -165,13 +165,13 @@ nmap -p- -sS --min-rate 5000 -open -vvv -n -Pn -oG allports 10.10.10.185
 ```
 
 Con el anterior comando estamos diciendo:
-	* -sS → Que vaya los más rápido posible. 
-	* –min-rate 5000 → Vamos a emitir como minimo 5000 paquetes por segundo (Ya no es necesario -T5)
+	- -sS → Que vaya los más rápido posible. 
+	- –min-rate 5000 → Vamos a emitir como minimo 5000 paquetes por segundo (Ya no es necesario -T5)
 
-	* -vvv → Para que nos arroje un poquito de más información de lo que encuentra nuestra busqueda.
+	- -vvv → Para que nos arroje un poquito de más información de lo que encuentra nuestra busqueda.
 
-	* -Pn → Solo ejecuta el escaneo con host que estan activos, a diferencial del escaneo normal que realiza el procedicimiento de escaneo para un rango de IP aunque el/los host especificados no esten activos.
-	* -oG allports → Le decimos que la busqueda realizada la guarde en un archivo grepeable llamado “allports”. [Aqui]( https://www.asyforin.es/kali/herramienta-kali-3-nmap-miscelanea-y-salida-de-datos/ ) puedes encontrar más información sobre el formato grepeable.
+	- -Pn → Solo ejecuta el escaneo con host que estan activos, a diferencial del escaneo normal que realiza el procedicimiento de escaneo para un rango de IP aunque el/los host especificados no esten activos.
+	- -oG allports → Le decimos que la busqueda realizada la guarde en un archivo grepeable llamado “allports”. [Aqui]( https://www.asyforin.es/kali/herramienta-kali-3-nmap-miscelanea-y-salida-de-datos/ ) puedes encontrar más información sobre el formato grepeable.
 
 
 ```
@@ -194,11 +194,11 @@ nmap -sCV -p22,80 10.10.10.185 -oN targered
 ```
 
 Con el anterior comando estamos diciendo:
-	* [-sCV](https://explainshell.com/explain?cmd=nmap+-sC+-sV+-v+) → Versiones y ejecución de algunos scripts por defecto de nmap (algunos scripts son intrusivos). 
+	- [-sCV](https://explainshell.com/explain?cmd=nmap+-sC+-sV+-v+) → Versiones y ejecución de algunos scripts por defecto de nmap (algunos scripts son intrusivos). 
  
-	* -p → Para especificar los comando a los cuales le queremos hacer lo anterior
+	- -p → Para especificar los comando a los cuales le queremos hacer lo anterior
 
-	* -oN targered → Que almacene en un archivo llamado “targered”en el formato de nmap (Salida normal) el resultado de este comando 
+	- -oN targered → Que almacene en un archivo llamado “targered”en el formato de nmap (Salida normal) el resultado de este comando 
 
 Resultado:
 
