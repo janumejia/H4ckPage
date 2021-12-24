@@ -24,6 +24,7 @@ tags:
 # Introducción
 
 Magic comienza con una vulnerabilidad clasica de carga insegura de archivos en PHP que nos permite colocar un webshell en el host de destino y luego explotamos una configuración incorrecta del servidor web para ejecutar el webshell (aunque el nombre del archivo no debe terminar con extensión .php). Una vez que aterrizamos un shell, escalamos a otro usuario.  
+<br>
 
 # Antes de iniciar
 Como es mi primera maquina virtual (box) y soy nuevo con la plataforma de hackthebox, para poder jugar con las maquinas virtuales necesito una conexión con OpenVPN (esta aplicación viene preinstalada en Parrot OS). Esta aplicación permitirá ubicar nuestra host en la misma subred IP que las máquinas vulnerables (boxes), lo que le permitirá contactarlos y atacarlos.
@@ -70,6 +71,7 @@ Respuesta:
        valid_lft forever preferred_lft forever
 
 ```
+<br>
 
 # Desarrollo de la practica
 
