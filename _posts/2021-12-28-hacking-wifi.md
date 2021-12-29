@@ -22,9 +22,9 @@ Tipos de ataques:
 - Ataques a redes WEP con clientes y autenticación SKA
 - Ataques a redes WEP sin clientes 
 
-## Ataques a redes WPA (La más común)
+# Ataques a redes WPA (La más común)
 
-### Modo monitor
+## Modo monitor
 
 Primero que todo debemos ponernos en modo monitor (modo para capturar todos los paquetes de red que viajan a nuestro alrededor). Primero matamos los procesos que molestan y son inecesarios en modo monitor:
 
@@ -67,7 +67,7 @@ En mi caso no cambia a **wlan0mon**, sino que el nombre se conserva ( **wlan0** 
 ```bash
 sudo airmon-ng stop wlan0 && service NetworkManager restart
 ```
-### Cambio de dirección MAC
+## Cambio de dirección MAC
 
 Primero debemos bajar la interfaz de red para poder monipular la MAC:
 
@@ -85,7 +85,7 @@ Permanent MAC: 28:cd:c4:a5:38:6f (unknown)
 New MAC:       00:20:91:da:1b:6a (J125, NATIONAL SECURITY AGENCY)
 ```
 
-### Analisis del entorno
+## Analisis del entorno
 
 Para registrar las redes wifi y estaciones(clientes) a nuestro alrededor, hacemos:
 
@@ -334,7 +334,7 @@ Estaciones no asociadas:
 
 ```
 
-### Fijar una red
+## Fijar una red
 
 ```bash
 # sudo airodump-ng -c 1 -w Captura --bssid F4:71:90:48:71:AC wlan0
@@ -353,7 +353,7 @@ Estaciones no asociadas:
 
 -c es el canal en el que se encuentra la red, y --bssid es la MAC de AP (Access Point). 
 
-### Captura de Handshake
+## Captura de Handshake
 
 **Ataque de deautenticación dirigido:** Tratamos de expulsar a una estación especifica de la red:
 
@@ -433,7 +433,7 @@ Device is still responding with 10000 clients connected!
 
 ```
 
-## Fuerza bruta con Hashcat
+# Fuerza bruta con Hashcat
 
 Creamos un formato utilizable por hashcat:
 
