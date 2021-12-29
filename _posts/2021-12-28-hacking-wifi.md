@@ -124,7 +124,7 @@ CH  2 ][ Elapsed: 1 min ][ 2021-12-28 16:12
 
 La red de pruebas es **hacklab**. El siguiente script en bash permite guardar todas las redes y estaciones encontradas (redeswifi-estaciones.sh):
 
-```
+```bash
 #!/bin/bash
 
 if [[ "$1" && -f "$1" ]]; then
