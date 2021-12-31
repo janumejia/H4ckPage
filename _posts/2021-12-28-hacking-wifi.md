@@ -5,7 +5,7 @@ excerpt: "Apuntes sobre como efectura un ataque contra redes Wifi en un laborato
 date: 2021-12-28
 classes: wide
 header:
-  teaser: /assets/images/htb-writeup-magic/magic_logo.png
+  teaser: /assets/images/hacking-wifi/imagen-hackear-wi-fi.webp
   teaser_home_page: true
   icon: /assets/images/hackthebox.webp
 categories:
