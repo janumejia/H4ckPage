@@ -476,92 +476,22 @@ magic-1424x900.jpg
 magic-hat_23-2147512156.jpg
 magic-wand.jpg
 trx.jpg
+www-data@ubuntu:/var/www/Magic/images/uploads$ ll
+ll
+ll: command not found
 ```
 Para corregir esto hacemos:
 
-```bash
+```go
 script /dev/null -c bash
 ```
 
-Oprimimos **Ctrl + Z** y:
-
-
-```bash
-stty raw -echo; fg
-```
-
-Después **reset** para resetear la configuración de la terminal, y tipo de terminal ponemos **xterm** . Ahora ajustamos algunas variables de entorno: 
-
-```bash
-export TERM=xterm
-export SHELL=bash
-```
-
-Y por ultimo acomodamos las dimensiones de la terminal que tiene reverse shell. Debemos ver en otra terminal cual es la dimensión de una terminal normal con **stty size**, y ajustar en la terminal de la reverse shell esta dimensiones con **stty rows 30 columns 135** . Comprobamos con el editor **nano** que la configuración se la correcta.
-
-Viendo el directorio home/ vemos el usuario **theseus** y un archivo user.txt que no podemos leer por falta de privilegio:
-
-<p align="center">
-  <img src="../assets/images/htb-writeup-magic/usuario-theseus.png">
-</p>
-
-Para encontrar las credenciales de este usuario recurrimos a la información que tiene la pagina (backend) a ver si se encuentran las credenciales en texto claro. En **/var/www/** encontramos:
-
-<p align="center">
-  <img src="../assets/images/htb-writeup-magic/carpeta-var-www.png">
-</p>
-
-Y en el archivo db.php5 vemos encontramos unas credenciales de base de datos:
-
-<p align="center">
-  <img src="../assets/images/htb-writeup-magic/archivo-dbphp5.png">
-</p>
-
-
-Intentamos sin éxito la autenticación en el sistema con estas credenciales:
-
-<p align="center">
-  <img src="../assets/images/htb-writeup-magic/fallo-autenticacion.png">
-</p>
-
-Buscamos en otros lugares a ver:
-
-<p align="center">
-  <img src="../assets/images/htb-writeup-magic/mysql-opciones.png">
-</p>
-
-<p align="center">
-  <img src="../assets/images/htb-writeup-magic/mysqlshow.png">
-</p>
 
 
 
 
-<p align="center">
-  <img src="../assets/images/htb-writeup-magic/comando-mysqldump.png">
-</p>
 
-<p align="center">
-  <img src="../assets/images/htb-writeup-magic/credencial-maestra.png">
-</p>
 
-Tenemos otra credencial! Probemos a ver:
-
-<p align="center">
-  <img src="../assets/images/htb-writeup-magic/credencial-maestra.png">
-</p>
-
-Y vualá:
-
-<p align="center">
-  <img src="../assets/images/htb-writeup-magic/adentro-de-theseus.png">
-</p>
-
-Y conseguimos la primera flag:
-
-<p align="center">
-  <img src="../assets/images/htb-writeup-magic/flag1.png">
-</p>
 
 Página donde muestran la reverse shell: [https://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet](https://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet) (Sección de PHP) y si queremos un archivo de reverse shell más robusto podemos descargar este: [https://pentestmonkey.net/tools/web-shells/php-reverse-shell ](https://pentestmonkey.net/tools/web-shells/php-reverse-shell ) 
 
