@@ -545,7 +545,7 @@ Buscamos en otros lugares a ver:
   <img src="../assets/images/htb-writeup-magic/credencial-maestra.png">
 </p>
 
-Tenemos otra credencial! Probemos a ver:
+Tenemos otra credencial! Probemos a ver (theseus:Th3s3usW4sK1ng):
 
 <p align="center">
   <img src="../assets/images/htb-writeup-magic/credencial-maestra.png">
@@ -562,6 +562,113 @@ Y conseguimos la primera flag:
 <p align="center">
   <img src="../assets/images/htb-writeup-magic/flag1.png">
 </p>
+
+Para conseguir la segunda flag (privilegios de administrador) podemos intentar buscando que archivos en el sistema tienen activo el bit **SETUID**: Si el bit setuid activó un archivo, el usuario que ejecuta ese archivo ejecutable obtiene los permisos del individuo o grupo propietario del archivo.
+
+<br>
+
+*Ejemplo:* Tiene un **s** en el campo de permiso de ejecución del propietario, y se encuentra en rojo el nombre del archivo.
+ 
+<p align="center">
+  <img src="../assets/images/htb-writeup-magic/archivo-con-setuid.png">
+</p>
+
+El comando para ver que archivos tiene este permiso es:
+
+```bash
+find / -perm -4000 2>/dev/null
+```
+
+Vemos un archivo raro llamado sysinfo:
+
+<p align="center">
+  <img src="../assets/images/htb-writeup-magic/archivo-raro.png">
+</p>
+
+Al ejecutarlo obtenemos:
+
+<p align="center">
+  <img src="../assets/images/htb-writeup-magic/ejecucion-sysinfo.png">
+</p>
+
+Vamos a lista las cadenas de caracteres imprimibles que tiene este archivo binario con **strings /bin/sysinfo**:
+
+<p align="center">
+  <img src="../assets/images/htb-writeup-magic/strings1.png">
+</p>
+
+<p align="center">
+  <img src="../assets/images/htb-writeup-magic/strings2.png">
+</p>
+
+Vemos algunos comandos. Está ejecutando comandos de forma relativa, y no absoluta. Entonces intentaremos que al ejecutarse el comando **fdisk -l** podamos ejecutar comandos a nivel de administrador (root).
+
+<br>
+
+Es necesario modificar el **PATH** de esta maquina Magic (El PATH se puede alterar en la sesión que estamos). Ejemplo del path:
+
+<p align="center">
+  <img src="../assets/images/htb-writeup-magic/PATH.png">
+</p>
+
+Agregamos el directorio /tmp al path con:
+
+```bash
+export PATH=/tmp:$PATH
+```
+<p align="center">
+  <img src="../assets/images/htb-writeup-magic/tmp-en-path.png">
+</p>
+
+El PATH tiene una prioridad de izquierda a derecha y **/tmp** queda de primero.
+
+<p align="center">
+  <img src="../assets/images/htb-writeup-magic/">
+</p>
+
+Entonces en **/tmp** creamos un archivo llamado **fdisk** con este contenido:
+
+```bash
+bash -p
+```
+
+<p align="center">
+  <img src="../assets/images/htb-writeup-magic/bash-p.png">
+</p>
+
+El anterior comando hace que cuando lance una bash se ejecute como el propietario, en este caso es root.
+
+<br>
+
+Le debemos dar permisos de ejecución a este programa con **chmod +x fdisk**.
+
+<p align="center">
+  <img src="../assets/images/htb-writeup-magic/bash-p.png">
+</p>
+
+Y ejecutamos el archivo con **/bin/sysinfo**. Veremos que podemos ejecutar comandos como root pero no nos imprime. A pesar de eso le damos permisos SUID para ejecutar la shell como administrador:
+
+<p align="center">
+  <img src="../assets/images/htb-writeup-magic/comandos-fdisk-secuestrado.png">
+</p>
+
+Y comprobamos si le cambiamos los permisos bien:
+
+<p align="center">
+  <img src="../assets/images/htb-writeup-magic/cambio-permisos-bash.png">
+</p>
+
+En este punto solo queda hacer **bash -p** y tenemos una bash con privilegios de administrador:
+
+<p align="center">
+  <img src="../assets/images/htb-writeup-magic/segunda-flag.png">
+</p>
+
+[TENEMOS LA FLAG DEL SISTEMA!](https://www.hackthebox.com/achievement/machine/851602/241) 
+
+<br>
+<br>
+<br>
 
 Página donde muestran la reverse shell: [https://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet](https://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet) (Sección de PHP) y si queremos un archivo de reverse shell más robusto podemos descargar este: [https://pentestmonkey.net/tools/web-shells/php-reverse-shell ](https://pentestmonkey.net/tools/web-shells/php-reverse-shell ) 
 
