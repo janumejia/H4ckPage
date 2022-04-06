@@ -21,7 +21,7 @@ tags:
 
 # Introducción
 
-La máquina FristiLeaks es una máquina fácil que posee una shell de privilegios bajos al explotar la funcionalidad de carga de archivos y se obtienen privilegios elevados con la ayuda de sudo. La máquina está bien diseñada, casi sin agujeros de conejo, lo cual es bueno para principiantes. La maquina está disponible en: [https://www.vulnhub.com/entry/fristileaks-13,133/] (https://www.vulnhub.com/entry/fristileaks-13,133/)
+La máquina FristiLeaks es una máquina fácil que posee una shell de privilegios bajos al explotar la funcionalidad de carga de archivos y se obtienen privilegios elevados con la ayuda de sudo. La máquina está bien diseñada, casi sin agujeros de conejo, lo cual es bueno para principiantes. La maquina está disponible en: [https://www.vulnhub.com/entry/fristileaks-13,133/](https://www.vulnhub.com/entry/fristileaks-13,133/)
 
 # CWE
 
