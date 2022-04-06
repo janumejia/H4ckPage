@@ -13,6 +13,7 @@ categories:
 tags:
   - Unrestricted File Upload
   - PHP
+  - Exposure of Private Information
 ---
 
 <p align="center">
@@ -126,6 +127,8 @@ Pero solo nos deja subir archivos con extensión de imagen: png, jpg, gif
 <p align="center">
   <img src="../assets/images/vulnhub-fristileaks-1-3/13.png">
 </p>
+
+# Ganar acceso/explotación
 
 Descargamos un exploit para ejecutar una reverse shell disponible en [https://pentestmonkey.net/tools/web-shells/php-reverse-shell](https://pentestmonkey.net/tools/web-shells/php-reverse-shell) y lo descomprimimos:
 
