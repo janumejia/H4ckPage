@@ -1,6 +1,6 @@
 ---
 layout: single
-title: PwnLab: init - Vulnhub
+title: PwnLab init - Vulnhub
 excerpt: "Esta máquina puede parecer para principiantes, ¡pero puedo asegurarles que esta los pondrá a prueba!. El propósito de este CTF es obtener root y leer la bandera."
 date: 2022-04-08
 classes: wide
