@@ -6,7 +6,7 @@ _Aquí escribo información que voy aprendiendo sobre Ciberseguridad y Hacking �
 
 Seguir los pasos de esta página para la instalación de jekyll en windows:<br>https://idratherbewriting.com/documentation-theme-jekyll/mydoc_install_jekyll_on_windows.html#bundler <br>(Hacer la guia hasta ejecutar "gem install bundler", además es necesaria una versión de RUBY menor a 2.8)
 
-Ejecutar los siguiente correr localmente:
+Ejecutar lo siguiente para correr localmente:
 ```
 bundle
 bundle exec jekyll serve
