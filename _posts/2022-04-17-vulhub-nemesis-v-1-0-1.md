@@ -1,6 +1,6 @@
 ---
 layout: single
-title: Nemesis v1.0.1
+title: Nemesis v1.0.1 - Vulnhub 
 excerpt: "Esta es una máquina boot2root de nivel medio que está disponible en Vulnhub. El objetivo de esta máquina es obtener una shell root y leer las 3 banderas. Además, se necesita un poco de habilidad en encriptación y programación."
 date: 2022-04-17
 classes: wide
